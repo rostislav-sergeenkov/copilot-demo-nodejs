@@ -1,6 +1,6 @@
 # Expense Tracker — Technical Implementation Roadmap
 
-This document provides a phased implementation plan to address all gaps identified in `SPECIFICATION.md` v1.2. The roadmap prioritizes critical functionality first and organizes work into logical milestones.
+This document provides a phased implementation plan to address all gaps identified in `SPECIFICATION.md` v1.3. The roadmap prioritizes critical functionality first and organizes work into logical milestones.
 
 > **Branching Model:** This project uses **Gitflow**. All feature development must follow the branching strategy defined in `SPECIFICATION.md` §7.
 
@@ -405,18 +405,20 @@ function enableSubmit() {
 
 ---
 
-## Phase 3: Form Validation & Error Handling (High)
+## Phase 3: Form Validation & Error Handling (High) 🔄 PARTIAL
 
 **Goal:** Implement comprehensive client-side validation and error handling.
 
-### Milestone 3.1: API Client Enhancements
+### Milestone 3.1: API Client Enhancements ✅ COMPLETE
 **File:** `app/public/js/api.js`
 
+**Completed:** December 4, 2025 | **PR:** [#8](https://github.com/rostislav-sergeenkov/copilot-demo-nodejs/pull/8) | **Issue:** [#2](https://github.com/rostislav-sergeenkov/copilot-demo-nodejs/issues/2) (Closed)
+
 #### Tasks:
-- [ ] **3.1.1** Add 10-second request timeout
-- [ ] **3.1.2** Implement `fetchWithTimeout` wrapper
-- [ ] **3.1.3** Handle AbortError for timeouts
-- [ ] **3.1.4** Handle network offline detection
+- [x] **3.1.1** Add 10-second request timeout
+- [x] **3.1.2** Implement `fetchWithTimeout` wrapper
+- [x] **3.1.3** Handle AbortError for timeouts
+- [x] **3.1.4** Handle network offline detection
 
 #### Implementation Details:
 ```javascript
@@ -891,14 +893,14 @@ git push -u origin feature/<issue-number>-<short-description>
 
 ### GitHub Issues → Roadmap Mapping
 
-| Issue | Phase | Milestone |
-|-------|-------|----------|
-| #1 | Phase 1 | 1.1-1.4 | ✅ Complete |
-| #3 | Phase 2 | 2.1-2.2 | Loading States |
-| #5 | Phase 2 | 2.2 | Snackbar Enhancement |
-| #2 | Phase 3 | 3.1 | API Timeout |
-| #6 | Phase 3 | 3.2-3.3 | Form Validation |
-| #4 | Phase 5 | 5.1-5.3 | Unit Tests |
+| Issue | Phase | Milestone | Status |
+|-------|-------|----------|--------|
+| #1 | Phase 1 | 1.1-1.4 | ✅ Complete (PR #7) |
+| #2 | Phase 3 | 3.1 | ✅ Complete (PR #8) |
+| #3 | Phase 2 | 2.1-2.2 | ⏳ Pending |
+| #4 | Phase 5 | 5.1-5.3 | ⏳ Pending |
+| #5 | Phase 2 | 2.4 | ⏳ Pending |
+| #6 | Phase 3 | 3.2-3.3 | ⏳ Pending |
 
 ---
 
@@ -933,7 +935,7 @@ git branch -d release/v1.1.0
 
 ---
 
-*Roadmap Version: 1.1*
+*Roadmap Version: 1.2*
 *Created: December 2025*
 *Updated: December 2025*
-*Based on: SPECIFICATION.md v1.2*
+*Based on: SPECIFICATION.md v1.3*
