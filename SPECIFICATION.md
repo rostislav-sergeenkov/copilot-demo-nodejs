@@ -33,8 +33,8 @@ The Expense Tracker is a web application that allows users to record and view da
 | Feature | Description | Status |
 |---------|-------------|--------|
 | F1 | Graphical CRUD UI for expenses (Material Design) | ✅ Implemented |
-| F2 | Display table of daily expenses with date selection | ⚠️ Partial (needs date picker) |
-| F3 | Display table of monthly expenses with month selection | ⚠️ Partial (needs month picker) |
+| F2 | Display table of daily expenses with date selection | ✅ Implemented |
+| F3 | Display table of monthly expenses with month selection | ✅ Implemented |
 | F4 | Filter expenses by category | ✅ Implemented |
 | F5 | Create, update, delete expense records | ✅ Implemented |
 
@@ -1188,13 +1188,15 @@ jobs:
   - [ ] Loading spinner styles
   - [ ] Inline error message styles
   - [ ] Disabled button states
-  - [ ] Date navigation controls
+  - [x] Date navigation controls
 
 - [x] **API Client** (`public/js/api.js`)
   - [x] ExpenseAPI object with all methods
   - [x] Fetch API with async/await
   - [x] Error handling and parsing
   - [x] Query parameter building
+  - [x] Request timeout handling (10s AbortController)
+  - [x] Network offline detection
 
 - [x] **Application Logic** (`public/js/app.js`)
   - [x] Application state management
@@ -1206,15 +1208,15 @@ jobs:
   - [x] Modal open/close handling
   - [x] Snackbar notifications
   - [x] Filter application
-  - [ ] Daily view with date selection
-  - [ ] Monthly view with month/year selection
-  - [ ] Date navigation (prev/next)
+  - [x] Daily view with date selection
+  - [x] Monthly view with month/year selection
+  - [x] Date navigation (prev/next)
   - [ ] Loading state management
   - [ ] Inline form validation
   - [ ] Focus trap in modals
   - [ ] Submit button disable during processing
-  - [ ] Request timeout handling
-  - [ ] Network error handling
+  - [x] Request timeout handling
+  - [x] Network error handling
 
 ### Testing
 
@@ -1290,50 +1292,51 @@ jobs:
 The following items were identified as missing or incomplete in the original implementation and have been added to this specification:
 
 ### Critical Priority (Must Fix)
-| ID | Issue | Section Updated |
-|----|-------|-----------------|
-| 1 | Daily/Monthly views don't filter data | View Toggle & Date Selection |
-| 2 | No date picker for Daily View | UI Components §3 |
-| 3 | No month/year selector for Monthly View | UI Components §3 |
+| ID | Issue | Section Updated | Status |
+|----|-------|-----------------|--------|
+| 1 | Daily/Monthly views don't filter data | View Toggle & Date Selection | ✅ Fixed (PR #7) |
+| 2 | No date picker for Daily View | UI Components §3 | ✅ Fixed (PR #7) |
+| 3 | No month/year selector for Monthly View | UI Components §3 | ✅ Fixed (PR #7) |
 
 ### Medium Priority (Should Fix)
-| ID | Issue | Section Updated |
-|----|-------|-----------------|
-| 4 | Missing loading states | UI Components §8, User Interactions |
-| 5 | Missing inline form validation errors | UI Components §9, Form Validation |
-| 6 | No max length for description field | Field Constraints Detail |
-| 7 | Missing keyboard focus styles | Accessibility Requirements |
-| 8 | Missing ARIA attributes | Accessibility Requirements |
-| 9 | Amount constraints undefined | Field Constraints Detail |
-| 10 | Date range validation undefined | Validation Rules |
-| 11 | Network error handling | Error Handling section |
-| 12 | No request timeout | api.js specification |
-| 13 | 500 vs 400 error distinction | HTTP Status Codes, Error Codes |
+| ID | Issue | Section Updated | Status |
+|----|-------|-----------------|--------|
+| 4 | Missing loading states | UI Components §8, User Interactions | ⏳ Pending |
+| 5 | Missing inline form validation errors | UI Components §9, Form Validation | ⏳ Pending |
+| 6 | No max length for description field | Field Constraints Detail | ⏳ Pending |
+| 7 | Missing keyboard focus styles | Accessibility Requirements | ⏳ Pending |
+| 8 | Missing ARIA attributes | Accessibility Requirements | ⏳ Pending |
+| 9 | Amount constraints undefined | Field Constraints Detail | ⏳ Pending |
+| 10 | Date range validation undefined | Validation Rules | ⏳ Pending |
+| 11 | Network error handling | Error Handling section | ✅ Fixed (PR #8) |
+| 12 | No request timeout | api.js specification | ✅ Fixed (PR #8) |
+| 13 | 500 vs 400 error distinction | HTTP Status Codes, Error Codes | ⏳ Pending |
 
 ### Items Added to Implementation Checklist
-- [ ] Date picker for daily view
-- [ ] Month/year selector for monthly view
+- [x] Date picker for daily view
+- [x] Month/year selector for monthly view
 - [ ] Snackbar close button
 - [ ] Loading spinner component
 - [ ] Inline error messages
 - [ ] Focus visible styles
-- [ ] Daily view with date selection
-- [ ] Monthly view with month/year selection
+- [x] Daily view with date selection
+- [x] Monthly view with month/year selection
 - [ ] Loading state management
 - [ ] Inline form validation
 - [ ] Focus trap in modals
 - [ ] Submit button disable during processing
-- [ ] Request timeout handling
-- [ ] Network error handling
+- [x] Request timeout handling
+- [x] Network error handling
 
 ---
 
-*Specification Version: 1.2*
+*Specification Version: 1.3*
 *Last Updated: December 2025*
 
 ### Changelog
 | Version | Date | Changes |
 |---------|------|---------|
+| 1.3 | Dec 2025 | Updated: Core Features F2/F3 status to Implemented, Implementation Checklist (date navigation, API timeout/network handling complete), Gap Analysis with completion status |
 | 1.2 | Dec 2025 | Added: Gitflow branching strategy section, branch rules, commit conventions, PR workflow, semantic versioning |
 | 1.1 | Dec 2025 | Added: Date selection for views, loading states, inline validation, accessibility requirements, error handling, field constraints, timeout configuration |
 | 1.0 | Dec 2025 | Initial specification |
