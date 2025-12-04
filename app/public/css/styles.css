@@ -537,6 +537,34 @@ body {
   font-size: 0.875rem;
   z-index: 300;
   animation: snackbarSlideIn var(--transition-standard);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.snackbar-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.7);
+  transition: color var(--transition-fast), background-color var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.snackbar-close:hover {
+  color: white;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.snackbar-close .material-icons {
+  font-size: 18px;
 }
 
 @keyframes snackbarSlideIn {
