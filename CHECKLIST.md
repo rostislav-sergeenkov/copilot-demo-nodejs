@@ -1,6 +1,8 @@
 # Expense Tracker — Acceptance Checklist
 
-Verification list for project acceptance based on `requirements.txt` and `TASKS.md`.
+Verification list for project acceptance based on `requirements.txt`, `TASKS.md` v2.2, and `SPECIFICATION.md` v1.2.
+
+> **Branching Model:** This project uses **Gitflow**. See `SPECIFICATION.md` §7 for workflow requirements.
 
 ---
 
@@ -79,34 +81,36 @@ Verification list for project acceptance based on `requirements.txt` and `TASKS.
 
 ## Task Implementation Verification
 
-### Task 1: Date Navigation UI ✓
-- [ ] Date navigation controls visible below view toggle
-- [ ] Daily: date input + prev/next + Today button
-- [ ] Monthly: month dropdown + year dropdown + prev/next + This Month
-- [ ] `setView()` toggles between views correctly
-- [ ] `loadDailyExpenses()` fetches from `/api/expenses/daily/:date`
-- [ ] `loadMonthlyExpenses()` fetches from `/api/expenses/monthly/:year/:month`
+### Task 1: Date Navigation UI ✅ COMPLETE
+- [x] Date navigation controls visible below view toggle
+- [x] Daily: date input + prev/next + Today button
+- [x] Monthly: month dropdown + year dropdown + prev/next + This Month
+- [x] `setView()` toggles between views correctly
+- [x] `loadDailyExpenses()` fetches from `/api/expenses/daily/:date`
+- [x] `loadMonthlyExpenses()` fetches from `/api/expenses/monthly/:year/:month`
 
-### Task 2: Loading States ✓
+**Completed:** December 4, 2025 | [PR #7](https://github.com/rostislav-sergeenkov/copilot-demo-nodejs/pull/7) | [Issue #1](https://github.com/rostislav-sergeenkov/copilot-demo-nodejs/issues/1)
+
+### Task 2: Loading States (Pending)
 - [ ] Loading overlay (`#loadingOverlay`) exists in HTML
 - [ ] Spinner visible during API calls (test with slow network)
 - [ ] Save button shows "Saving..." and is disabled during submit
 - [ ] Button re-enables after operation completes
 
-### Task 3: Snackbar Enhancement ✓
+### Task 3: Snackbar Enhancement (Pending)
 - [ ] Snackbar has close button (X)
 - [ ] `role="alert"` attribute present
 - [ ] `aria-live="polite"` attribute present
 - [ ] Clicking X dismisses snackbar immediately
 - [ ] Auto-dismiss still works (4 seconds)
 
-### Task 4: API Timeout & Network ✓
+### Task 4: API Timeout & Network (Pending)
 - [ ] Requests timeout after 10 seconds
 - [ ] Timeout shows: "Request timed out. Please try again."
 - [ ] Offline shows: "You appear to be offline. Please check your connection."
 - [ ] All API methods use `fetchWithTimeout()`
 
-### Task 5: Form Validation ✓
+### Task 5: Form Validation (Pending)
 - [ ] Description: max 200 characters enforced
 - [ ] Amount: max 999,999.99 enforced
 - [ ] Date: future dates rejected
@@ -115,7 +119,7 @@ Verification list for project acceptance based on `requirements.txt` and `TASKS.
 - [ ] Validation on blur (field loses focus)
 - [ ] Form submission blocked if validation fails
 
-### Task 6: Unit Tests ✓
+### Task 6: Unit Tests (Pending)
 - [ ] All new functions have tests
 - [ ] `npm test` passes
 - [ ] Coverage >= 80%
@@ -165,13 +169,42 @@ Run through this sequence to verify basic functionality:
 
 ---
 
+## Gitflow Workflow Verification
+
+### Branch Structure
+- [ ] `main` branch exists (production)
+- [ ] `develop` branch exists (integration)
+- [ ] Feature branches use `feature/<issue>-<description>` naming
+- [ ] Release branches use `release/v<version>` naming
+- [ ] Hotfix branches use `hotfix/<issue>-<description>` naming
+
+### Commit Standards
+- [ ] Commits use Conventional Commits format
+- [ ] Types used: `feat`, `fix`, `docs`, `test`, `refactor`, `style`, `chore`
+- [ ] Scope provided when relevant (e.g., `feat(ui):`, `fix(api):`)
+
+### Pull Request Workflow
+- [ ] PRs created from feature branches to `develop`
+- [ ] PR descriptions include "Closes #<issue>" or "Fixes #<issue>"
+- [ ] Squash merge used for feature → develop
+- [ ] Merge commit used for release → main
+- [ ] Feature branches deleted after merge
+
+### CI/CD Integration
+- [ ] CI runs on PRs to `develop` and `main`
+- [ ] CI runs on push to `develop` and `main`
+- [ ] Deployment triggers on push to `main` (if configured)
+
+---
+
 ## Sign-off
 
 | Area | Status | Verified By | Date |
 |------|--------|-------------|------|
 | Feature Requirements (F1-F5) | ☐ Pass / ☐ Fail | | |
 | Technical Requirements (T1-T5) | ☐ Pass / ☐ Fail | | |
-| Task Implementation (1-6) | ☐ Pass / ☐ Fail | | |
+| Task Implementation (1-6) | ☐ 1/6 Complete | | |
+| Gitflow Workflow | ☐ Pass / ☐ Fail | | |
 | Smoke Test | ☐ Pass / ☐ Fail | | |
 
 **Final Acceptance:** ☐ Approved / ☐ Rejected
@@ -184,6 +217,6 @@ Run through this sequence to verify basic functionality:
 
 ---
 
-*Checklist Version: 1.0*
-*Created: December 2025*
-*Based on: requirements.txt, TASKS.md v2.1*
+*Checklist Version: 1.1*
+*Updated: December 2025*
+*Based on: requirements.txt, TASKS.md v2.2, SPECIFICATION.md v1.2*
