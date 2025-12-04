@@ -17,9 +17,10 @@ This document provides a complete specification for building the Expense Tracker
    - [User Interactions](#user-interactions)
    - [Error Handling](#error-handling)
 6. [Testing Specification](#testing-specification)
-7. [CI/CD Pipeline](#cicd-pipeline)
-8. [Implementation Checklist](#implementation-checklist)
-9. [Appendix: Gap Analysis Summary](#appendix-gap-analysis-summary)
+7. [Branching Strategy (Gitflow)](#branching-strategy-gitflow)
+8. [CI/CD Pipeline](#cicd-pipeline)
+9. [Implementation Checklist](#implementation-checklist)
+10. [Appendix: Gap Analysis Summary](#appendix-gap-analysis-summary)
 
 ---
 
@@ -861,6 +862,214 @@ function validateForm(data) {
 
 ---
 
+## Branching Strategy (Gitflow)
+
+This project follows the **Gitflow** branching model for organized, structured development and release management.
+
+### Branch Types
+
+| Branch | Purpose | Naming Convention | Lifetime |
+|--------|---------|-------------------|----------|
+| `main` | Production-ready code | `main` | Permanent |
+| `develop` | Integration branch for features | `develop` | Permanent |
+| `feature/*` | New features and enhancements | `feature/<issue-id>-<short-description>` | Temporary |
+| `release/*` | Release preparation | `release/v<major>.<minor>.<patch>` | Temporary |
+| `hotfix/*` | Critical production fixes | `hotfix/v<major>.<minor>.<patch>` | Temporary |
+
+### Branch Workflow Diagram
+
+```
+main ─────●─────────────────●─────────────────●───────────► (production releases)
+          │                 │                 │
+          │                 │                 │
+          │    release/v1.0 │    hotfix/v1.0.1│
+          │        ↓        │        ↓        │
+develop ──┴────●────●───────┴────●────────────┴────●──────► (integration)
+               │    │            │                 │
+               │    │            │                 │
+         feature/1  feature/2    feature/3    feature/4
+```
+
+### Branch Rules
+
+#### `main` Branch
+- **Purpose**: Contains production-ready, stable code only
+- **Direct commits**: ❌ Prohibited
+- **Merge sources**: Only from `release/*` or `hotfix/*` branches
+- **Protection rules**:
+  - Require pull request reviews (minimum 1 approval)
+  - Require status checks to pass (CI/CD pipeline)
+  - Require branches to be up to date before merging
+  - Do not allow force pushes
+- **Tagging**: Every merge to `main` must be tagged with version (e.g., `v1.0.0`)
+
+#### `develop` Branch
+- **Purpose**: Integration branch where features are merged for testing
+- **Direct commits**: ❌ Prohibited (except minor documentation fixes)
+- **Merge sources**: From `feature/*` branches
+- **Protection rules**:
+  - Require pull request reviews
+  - Require status checks to pass
+  - Allow squash merging
+
+#### `feature/*` Branches
+- **Purpose**: Develop new features or implement GitHub Issues
+- **Created from**: `develop`
+- **Merged to**: `develop` (via Pull Request)
+- **Naming**: `feature/<issue-number>-<short-description>`
+  - Example: `feature/1-date-navigation-ui`
+  - Example: `feature/42-add-export-csv`
+- **Lifecycle**:
+  1. Create branch from `develop`
+  2. Implement feature with atomic commits
+  3. Push branch and create Pull Request to `develop`
+  4. Pass CI checks and code review
+  5. Squash merge to `develop`
+  6. Delete feature branch after merge
+
+#### `release/*` Branches
+- **Purpose**: Prepare for production release (final testing, versioning, changelog)
+- **Created from**: `develop`
+- **Merged to**: Both `main` AND `develop`
+- **Naming**: `release/v<major>.<minor>.<patch>`
+  - Example: `release/v1.0.0`
+  - Example: `release/v1.2.0`
+- **Allowed changes**: Bug fixes, documentation, version bumps only (no new features)
+- **Lifecycle**:
+  1. Create branch from `develop` when ready for release
+  2. Update version in `package.json`
+  3. Update CHANGELOG.md
+  4. Final testing and bug fixes
+  5. Merge to `main` with version tag
+  6. Back-merge to `develop`
+  7. Delete release branch
+
+#### `hotfix/*` Branches
+- **Purpose**: Fix critical bugs in production
+- **Created from**: `main`
+- **Merged to**: Both `main` AND `develop`
+- **Naming**: `hotfix/v<major>.<minor>.<patch>`
+  - Example: `hotfix/v1.0.1`
+- **Lifecycle**:
+  1. Create branch from `main`
+  2. Fix the critical bug
+  3. Bump patch version
+  4. Merge to `main` with version tag
+  5. Back-merge to `develop`
+  6. Delete hotfix branch
+
+### Commit Message Convention
+
+All commits must follow the [Conventional Commits](https://www.conventionalcommits.org/) specification:
+
+```
+<type>(<scope>): <description>
+
+[optional body]
+
+[optional footer(s)]
+```
+
+#### Commit Types
+| Type | Description |
+|------|-------------|
+| `feat` | New feature |
+| `fix` | Bug fix |
+| `docs` | Documentation changes |
+| `style` | Code style changes (formatting, no logic change) |
+| `refactor` | Code refactoring (no feature or bug fix) |
+| `test` | Adding or updating tests |
+| `chore` | Maintenance tasks, dependency updates |
+| `perf` | Performance improvements |
+| `ci` | CI/CD configuration changes |
+
+#### Examples
+```bash
+feat(ui): add date navigation with daily/monthly views
+fix(api): handle timeout errors gracefully
+docs(readme): update installation instructions
+test(frontend): add unit tests for form validation
+chore(deps): update better-sqlite3 to v9.5.0
+```
+
+#### Issue Linking
+Always link commits to GitHub Issues using keywords in the commit body or footer:
+
+```bash
+feat(form): add inline validation with error messages
+
+Implements client-side validation for expense form fields.
+
+Closes #5
+```
+
+### Pull Request Workflow
+
+#### Creating a Pull Request
+1. **Title**: Use conventional commit format
+   - Example: `feat(ui): add date navigation with daily/monthly views`
+2. **Description**: Include:
+   - Summary of changes
+   - Related issue link (`Closes #<issue-number>`)
+   - Test criteria checklist
+   - Screenshots (for UI changes)
+3. **Labels**: Add appropriate labels (`feature`, `bug`, `documentation`, etc.)
+4. **Reviewers**: Assign at least one reviewer
+
+#### PR Merge Strategy
+| Target Branch | Merge Strategy | Rationale |
+|---------------|----------------|-----------|
+| `develop` | Squash merge | Clean history, one commit per feature |
+| `main` | Merge commit | Preserve release/hotfix history |
+
+#### PR Checklist
+- [ ] Branch is up-to-date with target branch
+- [ ] All CI checks pass
+- [ ] Code review approved
+- [ ] No merge conflicts
+- [ ] Issue linked with closing keyword
+
+### Version Numbering (Semantic Versioning)
+
+This project follows [Semantic Versioning 2.0.0](https://semver.org/):
+
+```
+MAJOR.MINOR.PATCH
+```
+
+| Component | When to Increment | Example |
+|-----------|-------------------|---------|
+| MAJOR | Breaking changes, incompatible API changes | `1.0.0` → `2.0.0` |
+| MINOR | New features, backward-compatible | `1.0.0` → `1.1.0` |
+| PATCH | Bug fixes, backward-compatible | `1.0.0` → `1.0.1` |
+
+### Gitflow Quick Reference
+
+```bash
+# Start a new feature
+git checkout develop
+git pull origin develop
+git checkout -b feature/42-new-feature
+
+# Complete a feature (via PR)
+git push -u origin feature/42-new-feature
+# Create PR to develop, squash merge, delete branch
+
+# Start a release
+git checkout develop
+git pull origin develop
+git checkout -b release/v1.1.0
+# Update version, test, then merge to main and develop
+
+# Start a hotfix
+git checkout main
+git pull origin main
+git checkout -b hotfix/v1.0.1
+# Fix bug, bump patch version, merge to main and develop
+```
+
+---
+
 ## CI/CD Pipeline
 
 ### Workflow Configuration (`.github/workflows/ci.yml`)
@@ -870,9 +1079,9 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [main, master]
+    branches: [main, develop, 'release/**', 'hotfix/**']
   pull_request:
-    branches: [main, master]
+    branches: [main, develop]
 
 jobs:
   test:
@@ -895,6 +1104,16 @@ jobs:
       - Install dependencies
       - Check for syntax errors
 ```
+
+### CI/CD Triggers by Branch
+
+| Branch | Push Trigger | PR Trigger | Required Checks |
+|--------|--------------|------------|-----------------|
+| `main` | ✅ Yes | ✅ Yes (target) | All tests pass, coverage ≥80% |
+| `develop` | ✅ Yes | ✅ Yes (target) | All tests pass |
+| `feature/*` | ❌ No | ✅ Yes (to develop) | All tests pass |
+| `release/*` | ✅ Yes | ✅ Yes (to main) | All tests pass, coverage ≥80% |
+| `hotfix/*` | ✅ Yes | ✅ Yes (to main) | All tests pass |
 
 ### PR Merge Requirements
 1. ✅ All CI checks must pass
@@ -1015,6 +1234,29 @@ jobs:
   - [x] Test execution
   - [x] Coverage reporting
 
+### Gitflow Branching
+
+- [ ] **Branch Setup**
+  - [ ] Create `develop` branch from `main`
+  - [ ] Configure branch protection rules for `main`
+  - [ ] Configure branch protection rules for `develop`
+
+- [ ] **Feature Development**
+  - [x] Use `feature/*` branches for new features
+  - [x] Link branches to GitHub Issues
+  - [x] Create PRs to `develop` branch
+  - [x] Squash merge features to `develop`
+
+- [ ] **Release Process**
+  - [ ] Use `release/*` branches for releases
+  - [ ] Update version in package.json
+  - [ ] Merge to `main` with version tag
+  - [ ] Back-merge to `develop`
+
+- [ ] **Hotfix Process**
+  - [ ] Use `hotfix/*` branches from `main`
+  - [ ] Merge to both `main` and `develop`
+
 ---
 
 ## NPM Scripts Reference
@@ -1086,12 +1328,12 @@ The following items were identified as missing or incomplete in the original imp
 
 ---
 
-*Specification Version: 1.1*
+*Specification Version: 1.2*
 *Last Updated: December 2025*
 
 ### Changelog
 | Version | Date | Changes |
 |---------|------|---------|
+| 1.2 | Dec 2025 | Added: Gitflow branching strategy section, branch rules, commit conventions, PR workflow, semantic versioning |
 | 1.1 | Dec 2025 | Added: Date selection for views, loading states, inline validation, accessibility requirements, error handling, field constraints, timeout configuration |
 | 1.0 | Dec 2025 | Initial specification |
-*Last Updated: December 2025*
