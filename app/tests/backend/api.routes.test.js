@@ -10,6 +10,15 @@ const { handleRequest } = require('../../src/routes/api');
 const { initializeDatabase, closeDatabase, getDatabase } = require('../../src/database/init');
 const ExpenseModel = require('../../src/models/expense');
 
+// Suppress console.error for expected validation errors during tests
+const originalConsoleError = console.error;
+beforeAll(() => {
+  console.error = jest.fn();
+});
+afterAll(() => {
+  console.error = originalConsoleError;
+});
+
 // Helper to create mock request/response
 function createMockReqRes(method, url, body = null) {
   const req = new http.IncomingMessage();
