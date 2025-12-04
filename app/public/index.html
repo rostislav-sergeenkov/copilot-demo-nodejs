@@ -214,8 +214,11 @@
     </div>
 
     <!-- Snackbar for notifications -->
-    <div id="snackbar" class="snackbar hidden">
+    <div id="snackbar" class="snackbar hidden" role="alert" aria-live="polite">
       <span id="snackbarMessage"></span>
+      <button id="snackbarClose" class="snackbar-close" aria-label="Dismiss notification">
+        <span class="material-icons">close</span>
+      </button>
     </div>
   </div>
 

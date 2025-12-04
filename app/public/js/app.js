@@ -47,6 +47,7 @@ const elements = {
   confirmDeleteBtn: document.getElementById('confirmDeleteBtn'),
   snackbar: document.getElementById('snackbar'),
   snackbarMessage: document.getElementById('snackbarMessage'),
+  snackbarClose: document.getElementById('snackbarClose'),
   loadingOverlay: document.getElementById('loadingOverlay'),
   saveBtn: document.getElementById('saveBtn'),
   // Date Navigation Elements
@@ -294,6 +295,9 @@ function setupEventListeners() {
 
   // Delete confirmation
   elements.confirmDeleteBtn.addEventListener('click', confirmDelete);
+
+  // Snackbar close button
+  elements.snackbarClose.addEventListener('click', hideSnackbar);
 
   // Keyboard events
   document.addEventListener('keydown', (e) => {
@@ -629,16 +633,36 @@ async function confirmDelete() {
   }
 }
 
+// Snackbar timeout reference for cleanup
+let snackbarTimeout = null;
+
 /**
  * Show snackbar notification
  */
 function showSnackbar(message) {
+  // Clear any existing timeout
+  if (snackbarTimeout) {
+    clearTimeout(snackbarTimeout);
+  }
+  
   elements.snackbarMessage.textContent = message;
   elements.snackbar.classList.remove('hidden');
   
-  setTimeout(() => {
-    elements.snackbar.classList.add('hidden');
+  // Auto-dismiss after 4 seconds
+  snackbarTimeout = setTimeout(() => {
+    hideSnackbar();
   }, 4000);
+}
+
+/**
+ * Hide snackbar notification
+ */
+function hideSnackbar() {
+  if (snackbarTimeout) {
+    clearTimeout(snackbarTimeout);
+    snackbarTimeout = null;
+  }
+  elements.snackbar.classList.add('hidden');
 }
 
 /**
@@ -704,6 +728,8 @@ if (typeof module !== 'undefined' && module.exports) {
     updateMonthlyNavigationButtons,
     updateTableTitle,
     showLoading,
-    hideLoading
+    hideLoading,
+    showSnackbar,
+    hideSnackbar
   };
 }
