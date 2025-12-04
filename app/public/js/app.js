@@ -45,7 +45,19 @@ const elements = {
   deleteModal: document.getElementById('deleteModal'),
   confirmDeleteBtn: document.getElementById('confirmDeleteBtn'),
   snackbar: document.getElementById('snackbar'),
-  snackbarMessage: document.getElementById('snackbarMessage')
+  snackbarMessage: document.getElementById('snackbarMessage'),
+  // Date Navigation Elements
+  dailyControls: document.getElementById('dailyControls'),
+  monthlyControls: document.getElementById('monthlyControls'),
+  datePicker: document.getElementById('datePicker'),
+  prevDayBtn: document.getElementById('prevDayBtn'),
+  nextDayBtn: document.getElementById('nextDayBtn'),
+  todayBtn: document.getElementById('todayBtn'),
+  monthSelect: document.getElementById('monthSelect'),
+  yearSelect: document.getElementById('yearSelect'),
+  prevMonthBtn: document.getElementById('prevMonthBtn'),
+  nextMonthBtn: document.getElementById('nextMonthBtn'),
+  thisMonthBtn: document.getElementById('thisMonthBtn')
 };
 
 // Category CSS class mapping
@@ -65,6 +77,8 @@ const categoryClassMap = {
 async function init() {
   try {
     await loadCategories();
+    populateYearDropdown();
+    initializeDateControls();
     await loadExpenses();
     setupEventListeners();
     setDefaultDate();
@@ -118,8 +132,17 @@ function populateCategoryDropdowns() {
  */
 async function loadExpenses() {
   try {
-    const filters = { ...state.filters };
-    state.expenses = await ExpenseAPI.getAll(filters);
+    // If filters are applied, use filters
+    if (state.filters.category || state.filters.startDate || state.filters.endDate) {
+      const filters = { ...state.filters };
+      state.expenses = await ExpenseAPI.getAll(filters);
+    } else if (state.currentView === 'daily') {
+      // Load daily expenses
+      state.expenses = await ExpenseAPI.getDaily(state.selectedDate);
+    } else {
+      // Load monthly expenses
+      state.expenses = await ExpenseAPI.getMonthly(state.selectedYear, state.selectedMonth);
+    }
     renderExpenses();
     updateTableTitle();
   } catch (error) {
@@ -180,9 +203,20 @@ function updateTableTitle() {
   if (state.filters.category || state.filters.startDate || state.filters.endDate) {
     elements.tableTitle.textContent = 'Filtered Expenses';
   } else if (state.currentView === 'daily') {
-    elements.tableTitle.textContent = 'All Expenses';
+    const date = new Date(state.selectedDate + 'T00:00:00');
+    const formattedDate = new Intl.DateTimeFormat('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    }).format(date);
+    elements.tableTitle.textContent = `Expenses for ${formattedDate}`;
   } else {
-    elements.tableTitle.textContent = 'Monthly Expenses';
+    const date = new Date(state.selectedYear, state.selectedMonth - 1, 1);
+    const formattedMonth = new Intl.DateTimeFormat('en-US', {
+      year: 'numeric',
+      month: 'long'
+    }).format(date);
+    elements.tableTitle.textContent = formattedMonth;
   }
 }
 
@@ -204,6 +238,19 @@ function setupEventListeners() {
   // View toggle
   elements.dailyViewBtn.addEventListener('click', () => setView('daily'));
   elements.monthlyViewBtn.addEventListener('click', () => setView('monthly'));
+
+  // Date Navigation - Daily
+  elements.datePicker.addEventListener('change', handleDatePickerChange);
+  elements.prevDayBtn.addEventListener('click', goToPreviousDay);
+  elements.nextDayBtn.addEventListener('click', goToNextDay);
+  elements.todayBtn.addEventListener('click', goToToday);
+
+  // Date Navigation - Monthly
+  elements.monthSelect.addEventListener('change', handleMonthChange);
+  elements.yearSelect.addEventListener('change', handleYearChange);
+  elements.prevMonthBtn.addEventListener('click', goToPreviousMonth);
+  elements.nextMonthBtn.addEventListener('click', goToNextMonth);
+  elements.thisMonthBtn.addEventListener('click', goToThisMonth);
 
   // Add expense button
   elements.addExpenseBtn.addEventListener('click', openModal);
@@ -261,12 +308,189 @@ function setView(view) {
   if (view === 'daily') {
     elements.dailyViewBtn.classList.add('active');
     elements.monthlyViewBtn.classList.remove('active');
+    elements.dailyControls.classList.remove('hidden');
+    elements.monthlyControls.classList.add('hidden');
   } else {
     elements.dailyViewBtn.classList.remove('active');
     elements.monthlyViewBtn.classList.add('active');
+    elements.dailyControls.classList.add('hidden');
+    elements.monthlyControls.classList.remove('hidden');
   }
   
-  updateTableTitle();
+  // Clear filters when switching views
+  state.filters = { category: '', startDate: '', endDate: '' };
+  elements.filterCategory.value = '';
+  elements.filterStartDate.value = '';
+  elements.filterEndDate.value = '';
+  
+  loadExpenses();
+}
+
+/**
+ * Populate year dropdown with years (current year - 5 to current year)
+ */
+function populateYearDropdown() {
+  const currentYear = new Date().getFullYear();
+  const startYear = currentYear - 5;
+  
+  elements.yearSelect.innerHTML = '';
+  for (let year = currentYear; year >= startYear; year--) {
+    const option = document.createElement('option');
+    option.value = year;
+    option.textContent = year;
+    elements.yearSelect.appendChild(option);
+  }
+  elements.yearSelect.value = state.selectedYear;
+}
+
+/**
+ * Initialize date controls with current values
+ */
+function initializeDateControls() {
+  // Set date picker to selected date
+  elements.datePicker.value = state.selectedDate;
+  elements.datePicker.max = new Date().toISOString().split('T')[0]; // Block future dates
+  
+  // Set month/year dropdowns
+  elements.monthSelect.value = state.selectedMonth;
+  elements.yearSelect.value = state.selectedYear;
+  
+  // Update navigation button states
+  updateDailyNavigationButtons();
+  updateMonthlyNavigationButtons();
+}
+
+/**
+ * Handle date picker change
+ */
+async function handleDatePickerChange() {
+  state.selectedDate = elements.datePicker.value;
+  updateDailyNavigationButtons();
+  await loadExpenses();
+}
+
+/**
+ * Go to previous day
+ */
+async function goToPreviousDay() {
+  const date = new Date(state.selectedDate + 'T00:00:00');
+  date.setDate(date.getDate() - 1);
+  state.selectedDate = date.toISOString().split('T')[0];
+  elements.datePicker.value = state.selectedDate;
+  updateDailyNavigationButtons();
+  await loadExpenses();
+}
+
+/**
+ * Go to next day
+ */
+async function goToNextDay() {
+  const date = new Date(state.selectedDate + 'T00:00:00');
+  date.setDate(date.getDate() + 1);
+  state.selectedDate = date.toISOString().split('T')[0];
+  elements.datePicker.value = state.selectedDate;
+  updateDailyNavigationButtons();
+  await loadExpenses();
+}
+
+/**
+ * Go to today
+ */
+async function goToToday() {
+  state.selectedDate = new Date().toISOString().split('T')[0];
+  elements.datePicker.value = state.selectedDate;
+  updateDailyNavigationButtons();
+  await loadExpenses();
+}
+
+/**
+ * Handle month dropdown change
+ */
+async function handleMonthChange() {
+  state.selectedMonth = parseInt(elements.monthSelect.value);
+  updateMonthlyNavigationButtons();
+  await loadExpenses();
+}
+
+/**
+ * Handle year dropdown change
+ */
+async function handleYearChange() {
+  state.selectedYear = parseInt(elements.yearSelect.value);
+  updateMonthlyNavigationButtons();
+  await loadExpenses();
+}
+
+/**
+ * Go to previous month
+ */
+async function goToPreviousMonth() {
+  if (state.selectedMonth === 1) {
+    state.selectedMonth = 12;
+    state.selectedYear--;
+  } else {
+    state.selectedMonth--;
+  }
+  elements.monthSelect.value = state.selectedMonth;
+  elements.yearSelect.value = state.selectedYear;
+  updateMonthlyNavigationButtons();
+  await loadExpenses();
+}
+
+/**
+ * Go to next month
+ */
+async function goToNextMonth() {
+  if (state.selectedMonth === 12) {
+    state.selectedMonth = 1;
+    state.selectedYear++;
+  } else {
+    state.selectedMonth++;
+  }
+  elements.monthSelect.value = state.selectedMonth;
+  elements.yearSelect.value = state.selectedYear;
+  updateMonthlyNavigationButtons();
+  await loadExpenses();
+}
+
+/**
+ * Go to current month
+ */
+async function goToThisMonth() {
+  const now = new Date();
+  state.selectedYear = now.getFullYear();
+  state.selectedMonth = now.getMonth() + 1;
+  elements.monthSelect.value = state.selectedMonth;
+  elements.yearSelect.value = state.selectedYear;
+  updateMonthlyNavigationButtons();
+  await loadExpenses();
+}
+
+/**
+ * Update daily navigation button states (disable next if at today)
+ */
+function updateDailyNavigationButtons() {
+  const today = new Date().toISOString().split('T')[0];
+  const selectedDate = state.selectedDate;
+  
+  // Disable next button if selected date is today or in the future
+  elements.nextDayBtn.disabled = selectedDate >= today;
+}
+
+/**
+ * Update monthly navigation button states (disable next if at current month)
+ */
+function updateMonthlyNavigationButtons() {
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const currentMonth = now.getMonth() + 1;
+  
+  // Disable next button if at current month or beyond
+  const isCurrentOrFuture = 
+    state.selectedYear > currentYear || 
+    (state.selectedYear === currentYear && state.selectedMonth >= currentMonth);
+  
+  elements.nextMonthBtn.disabled = isCurrentOrFuture;
 }
 
 /**
@@ -428,6 +652,21 @@ if (typeof module !== 'undefined' && module.exports) {
     formatDate,
     escapeHtml,
     applyFilters,
-    clearFilters
+    clearFilters,
+    setView,
+    populateYearDropdown,
+    initializeDateControls,
+    handleDatePickerChange,
+    goToPreviousDay,
+    goToNextDay,
+    goToToday,
+    handleMonthChange,
+    handleYearChange,
+    goToPreviousMonth,
+    goToNextMonth,
+    goToThisMonth,
+    updateDailyNavigationButtons,
+    updateMonthlyNavigationButtons,
+    updateTableTitle
   };
 }
