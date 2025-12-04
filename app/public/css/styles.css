@@ -319,6 +319,48 @@ body {
   border-color: var(--primary-color);
 }
 
+/* Date Navigation */
+.date-navigation {
+  padding: 16px 24px;
+  margin-bottom: 24px;
+}
+
+.date-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.date-picker {
+  width: auto;
+  min-width: 160px;
+  text-align: center;
+}
+
+.month-select,
+.year-select {
+  width: auto;
+  min-width: 120px;
+}
+
+.year-select {
+  min-width: 100px;
+}
+
+.btn-small {
+  padding: 8px 16px;
+  font-size: 0.75rem;
+}
+
+.btn-icon:disabled,
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
 /* Data Table */
 .table-container {
   overflow-x: auto;
@@ -541,6 +583,17 @@ body {
 
   .toggle-btn {
     justify-content: center;
+  }
+
+  .date-controls {
+    gap: 8px;
+  }
+
+  .date-picker,
+  .month-select,
+  .year-select {
+    min-width: auto;
+    flex: 1;
   }
 
   .data-table th,

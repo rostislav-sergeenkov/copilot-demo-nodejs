@@ -65,6 +65,47 @@
         </button>
       </div>
 
+      <!-- Date Navigation -->
+      <section class="card date-navigation">
+        <!-- Daily View Controls -->
+        <div id="dailyControls" class="date-controls">
+          <button id="prevDayBtn" class="btn btn-icon" title="Previous Day">
+            <span class="material-icons">chevron_left</span>
+          </button>
+          <input type="date" id="datePicker" class="input-field date-picker">
+          <button id="nextDayBtn" class="btn btn-icon" title="Next Day">
+            <span class="material-icons">chevron_right</span>
+          </button>
+          <button id="todayBtn" class="btn btn-outlined btn-small">Today</button>
+        </div>
+
+        <!-- Monthly View Controls -->
+        <div id="monthlyControls" class="date-controls hidden">
+          <button id="prevMonthBtn" class="btn btn-icon" title="Previous Month">
+            <span class="material-icons">chevron_left</span>
+          </button>
+          <select id="monthSelect" class="input-select month-select">
+            <option value="1">January</option>
+            <option value="2">February</option>
+            <option value="3">March</option>
+            <option value="4">April</option>
+            <option value="5">May</option>
+            <option value="6">June</option>
+            <option value="7">July</option>
+            <option value="8">August</option>
+            <option value="9">September</option>
+            <option value="10">October</option>
+            <option value="11">November</option>
+            <option value="12">December</option>
+          </select>
+          <select id="yearSelect" class="input-select year-select"></select>
+          <button id="nextMonthBtn" class="btn btn-icon" title="Next Month">
+            <span class="material-icons">chevron_right</span>
+          </button>
+          <button id="thisMonthBtn" class="btn btn-outlined btn-small">This Month</button>
+        </div>
+      </section>
+
       <!-- Expenses Table Section -->
       <section class="card expenses-section">
         <div class="section-header">
