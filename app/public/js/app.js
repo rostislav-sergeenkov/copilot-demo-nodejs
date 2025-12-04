@@ -43,6 +43,11 @@ const elements = {
   amount: document.getElementById('amount'),
   category: document.getElementById('category'),
   date: document.getElementById('date'),
+  // Error containers
+  descriptionError: document.getElementById('descriptionError'),
+  amountError: document.getElementById('amountError'),
+  categoryError: document.getElementById('categoryError'),
+  dateError: document.getElementById('dateError'),
   deleteModal: document.getElementById('deleteModal'),
   confirmDeleteBtn: document.getElementById('confirmDeleteBtn'),
   snackbar: document.getElementById('snackbar'),
@@ -284,6 +289,12 @@ function setupEventListeners() {
 
   // Form submission
   elements.expenseForm.addEventListener('submit', handleFormSubmit);
+
+  // Form field blur validation
+  elements.description.addEventListener('blur', () => validateFieldOnBlur('description'));
+  elements.amount.addEventListener('blur', () => validateFieldOnBlur('amount'));
+  elements.category.addEventListener('blur', () => validateFieldOnBlur('category'));
+  elements.date.addEventListener('blur', () => validateFieldOnBlur('date'));
 
   // Modal backdrop clicks
   document.querySelectorAll('.modal-backdrop').forEach(backdrop => {
@@ -561,6 +572,7 @@ async function openEditModal(id) {
 function closeModal() {
   elements.expenseModal.classList.add('hidden');
   elements.expenseForm.reset();
+  clearAllFieldErrors();
   state.editingId = null;
 }
 
@@ -581,6 +593,113 @@ function closeDeleteModal() {
 }
 
 /**
+ * Validate form data and return errors object
+ * @param {Object} data - Form data to validate
+ * @returns {Object} - Object with field names as keys and error messages as values
+ */
+function validateForm(data) {
+  const errors = {};
+  const today = new Date().toISOString().split('T')[0];
+
+  // Description validation
+  if (!data.description || data.description.trim() === '') {
+    errors.description = 'Description is required';
+  } else if (data.description.trim().length > 200) {
+    errors.description = 'Description must be 200 characters or less';
+  }
+
+  // Amount validation
+  if (data.amount === undefined || data.amount === null || data.amount === '' || isNaN(data.amount)) {
+    errors.amount = 'Amount is required';
+  } else if (data.amount <= 0) {
+    errors.amount = 'Amount must be greater than 0';
+  } else if (data.amount > 999999.99) {
+    errors.amount = 'Amount must be 999,999.99 or less';
+  }
+
+  // Category validation
+  if (!data.category || data.category === '') {
+    errors.category = 'Category is required';
+  }
+
+  // Date validation
+  if (!data.date || data.date === '') {
+    errors.date = 'Date is required';
+  } else if (data.date > today) {
+    errors.date = 'Future dates are not allowed';
+  }
+
+  return errors;
+}
+
+/**
+ * Show error message for a specific field
+ * @param {string} field - Field name
+ * @param {string} message - Error message
+ */
+function showFieldError(field, message) {
+  const inputElement = elements[field];
+  const errorElement = elements[field + 'Error'];
+  
+  if (inputElement) {
+    inputElement.classList.add('error');
+    inputElement.setAttribute('aria-invalid', 'true');
+  }
+  
+  if (errorElement) {
+    errorElement.textContent = message;
+  }
+}
+
+/**
+ * Clear error message for a specific field
+ * @param {string} field - Field name
+ */
+function clearFieldError(field) {
+  const inputElement = elements[field];
+  const errorElement = elements[field + 'Error'];
+  
+  if (inputElement) {
+    inputElement.classList.remove('error');
+    inputElement.setAttribute('aria-invalid', 'false');
+  }
+  
+  if (errorElement) {
+    errorElement.textContent = '';
+  }
+}
+
+/**
+ * Clear all field errors
+ */
+function clearAllFieldErrors() {
+  ['description', 'amount', 'category', 'date'].forEach(field => {
+    clearFieldError(field);
+  });
+}
+
+/**
+ * Validate a single field on blur
+ * @param {string} field - Field name
+ */
+function validateFieldOnBlur(field) {
+  const data = {
+    description: elements.description.value,
+    amount: parseFloat(elements.amount.value),
+    category: elements.category.value,
+    date: elements.date.value
+  };
+  
+  const errors = validateForm(data);
+  
+  if (errors[field]) {
+    showFieldError(field, errors[field]);
+  } else {
+    clearFieldError(field);
+  }
+}
+
+/**
  * Handle form submission
  */
 async function handleFormSubmit(e) {
@@ -592,6 +711,18 @@ async function handleFormSubmit(e) {
     category: elements.category.value,
     date: elements.date.value
   };
+
+  // Validate form
+  clearAllFieldErrors();
+  const errors = validateForm(expenseData);
+  
+  // If there are validation errors, show them and stop
+  if (Object.keys(errors).length > 0) {
+    Object.keys(errors).forEach(field => {
+      showFieldError(field, errors[field]);
+    });
+    return;
+  }
 
   // Disable save button and show "Saving..."
   const originalText = elements.saveBtn.textContent;
@@ -730,6 +861,11 @@ if (typeof module !== 'undefined' && module.exports) {
     showLoading,
     hideLoading,
     showSnackbar,
-    hideSnackbar
+    hideSnackbar,
+    validateForm,
+    showFieldError,
+    clearFieldError,
+    clearAllFieldErrors,
+    validateFieldOnBlur
   };
 }
