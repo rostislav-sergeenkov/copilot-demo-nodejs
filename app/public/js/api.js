@@ -3,6 +3,51 @@
  */
 
 const API_BASE_URL = '/api';
+const API_TIMEOUT = 10000; // 10 seconds
+
+/**
+ * Check if the browser is online
+ * @returns {boolean} True if online, false if offline
+ */
+function isOnline() {
+  return typeof navigator !== 'undefined' ? navigator.onLine : true;
+}
+
+/**
+ * Fetch with timeout wrapper using AbortController
+ * @param {string} url - The URL to fetch
+ * @param {Object} options - Fetch options
+ * @returns {Promise<Response>} Fetch response
+ * @throws {Error} If request times out or network is offline
+ */
+async function fetchWithTimeout(url, options = {}) {
+  // Check if offline before making request
+  if (!isOnline()) {
+    throw new Error('You appear to be offline. Please check your connection.');
+  }
+
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT);
+
+  try {
+    const response = await fetch(url, {
+      ...options,
+      signal: controller.signal
+    });
+    return response;
+  } catch (error) {
+    if (error.name === 'AbortError') {
+      throw new Error('Request timed out. Please try again.');
+    }
+    // Re-check online status on fetch error
+    if (!isOnline()) {
+      throw new Error('You appear to be offline. Please check your connection.');
+    }
+    throw error;
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
 
 const ExpenseAPI = {
   /**
@@ -19,7 +64,7 @@ const ExpenseAPI = {
     const queryString = params.toString();
     const url = `${API_BASE_URL}/expenses${queryString ? '?' + queryString : ''}`;
     
-    const response = await fetch(url);
+    const response = await fetchWithTimeout(url);
     if (!response.ok) {
       const error = await response.json();
       throw new Error(error.error || 'Failed to fetch expenses');
@@ -33,7 +78,7 @@ const ExpenseAPI = {
    * @returns {Promise<Object>} Expense object
    */
   async getById(id) {
-    const response = await fetch(`${API_BASE_URL}/expenses/${id}`);
+    const response = await fetchWithTimeout(`${API_BASE_URL}/expenses/${id}`);
     if (!response.ok) {
       const error = await response.json();
       throw new Error(error.error || 'Failed to fetch expense');
@@ -47,7 +92,7 @@ const ExpenseAPI = {
    * @returns {Promise<Array>} Array of expense objects
    */
   async getDaily(date) {
-    const response = await fetch(`${API_BASE_URL}/expenses/daily/${date}`);
+    const response = await fetchWithTimeout(`${API_BASE_URL}/expenses/daily/${date}`);
     if (!response.ok) {
       const error = await response.json();
       throw new Error(error.error || 'Failed to fetch daily expenses');
@@ -62,7 +107,7 @@ const ExpenseAPI = {
    * @returns {Promise<Array>} Array of expense objects
    */
   async getMonthly(year, month) {
-    const response = await fetch(`${API_BASE_URL}/expenses/monthly/${year}/${month}`);
+    const response = await fetchWithTimeout(`${API_BASE_URL}/expenses/monthly/${year}/${month}`);
     if (!response.ok) {
       const error = await response.json();
       throw new Error(error.error || 'Failed to fetch monthly expenses');
@@ -76,7 +121,7 @@ const ExpenseAPI = {
    * @returns {Promise<Object>} Created expense object
    */
   async create(expense) {
-    const response = await fetch(`${API_BASE_URL}/expenses`, {
+    const response = await fetchWithTimeout(`${API_BASE_URL}/expenses`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -97,7 +142,7 @@ const ExpenseAPI = {
    * @returns {Promise<Object>} Updated expense object
    */
   async update(id, expense) {
-    const response = await fetch(`${API_BASE_URL}/expenses/${id}`, {
+    const response = await fetchWithTimeout(`${API_BASE_URL}/expenses/${id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -117,7 +162,7 @@ const ExpenseAPI = {
    * @returns {Promise<void>}
    */
   async delete(id) {
-    const response = await fetch(`${API_BASE_URL}/expenses/${id}`, {
+    const response = await fetchWithTimeout(`${API_BASE_URL}/expenses/${id}`, {
       method: 'DELETE',
     });
     if (!response.ok && response.status !== 204) {
@@ -131,7 +176,7 @@ const ExpenseAPI = {
    * @returns {Promise<Array>} Array of category strings
    */
   async getCategories() {
-    const response = await fetch(`${API_BASE_URL}/categories`);
+    const response = await fetchWithTimeout(`${API_BASE_URL}/categories`);
     if (!response.ok) {
       const error = await response.json();
       throw new Error(error.error || 'Failed to fetch categories');
@@ -142,5 +187,5 @@ const ExpenseAPI = {
 
 // Export for testing
 if (typeof module !== 'undefined' && module.exports) {
-  module.exports = ExpenseAPI;
+  module.exports = { ExpenseAPI, fetchWithTimeout, isOnline, API_TIMEOUT };
 }
