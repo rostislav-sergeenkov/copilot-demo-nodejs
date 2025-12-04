@@ -1,11 +1,15 @@
 # Expense Tracker — Implementation Tasks
 
-Consolidated tasks derived from `ROADMAP.md`. One task per stage for minimal overhead.
+Consolidated tasks derived from `ROADMAP.md` v1.1. One task per stage for minimal overhead.
+
+> **Branching Model:** Use **Gitflow** workflow. See `SPECIFICATION.md` §7 for branch naming and commit conventions.
 
 ---
 
-## Task 1: Date Navigation UI (Critical)
+## Task 1: Date Navigation UI (Critical) ✅ COMPLETE
 **Goal:** Add date/month selection controls to filter expenses by day or month.
+
+**Status:** ✅ Completed December 4, 2025 | [PR #7](https://github.com/rostislav-sergeenkov/copilot-demo-nodejs/pull/7) | [Issue #1](https://github.com/rostislav-sergeenkov/copilot-demo-nodejs/issues/1) (Closed)
 
 **Files:** `index.html`, `styles.css`, `app.js`
 
@@ -20,14 +24,14 @@ Consolidated tasks derived from `ROADMAP.md`. One task per stage for minimal ove
 - Update `updateTableTitle()` to show formatted date/month
 
 **Test Criteria:**
-- [ ] Date navigation controls visible and styled
-- [ ] Clicking Daily/Monthly shows correct controls
-- [ ] Table shows only expenses for selected date (daily view)
-- [ ] Table shows only expenses for selected month (monthly view)
-- [ ] Prev/Next navigation works correctly
-- [ ] Next button disabled at today/current month
-- [ ] Today/This Month buttons reset to current period
-- [ ] Title shows "Expenses for Dec 4, 2025" or "December 2025"
+- [x] Date navigation controls visible and styled
+- [x] Clicking Daily/Monthly shows correct controls
+- [x] Table shows only expenses for selected date (daily view)
+- [x] Table shows only expenses for selected month (monthly view)
+- [x] Prev/Next navigation works correctly
+- [x] Next button disabled at today/current month
+- [x] Today/This Month buttons reset to current period
+- [x] Title shows "Expenses for Dec 4, 2025" or "December 2025"
 
 ---
 
@@ -142,40 +146,63 @@ Consolidated tasks derived from `ROADMAP.md`. One task per stage for minimal ove
 
 ## Summary
 
-| Task | Priority | Files |
-|------|----------|-------|
-| 1. Date Navigation UI | Critical | `index.html`, `styles.css`, `app.js` |
-| 2. Loading States | High | `index.html`, `styles.css`, `app.js` |
-| 3. Snackbar Enhancement | High | `index.html`, `styles.css`, `app.js` |
-| 4. API Timeout & Network | High | `api.js` |
+| Task | Priority | Files | Issue | Status |
+|------|----------|-------|-------|--------|
+| 1. Date Navigation UI | Critical | `index.html`, `styles.css`, `app.js` | [#1](https://github.com/rostislav-sergeenkov/copilot-demo-nodejs/issues/1) | ✅ Complete |
+| 2. Loading States | High | `index.html`, `styles.css`, `app.js` | [#3](https://github.com/rostislav-sergeenkov/copilot-demo-nodejs/issues/3) | 🔄 In Progress |
+| 3. Snackbar Enhancement | High | `index.html`, `styles.css`, `app.js` | [#5](https://github.com/rostislav-sergeenkov/copilot-demo-nodejs/issues/5) | ⏳ Pending |
+| 4. API Timeout & Network | High | `api.js` | [#2](https://github.com/rostislav-sergeenkov/copilot-demo-nodejs/issues/2) | ⏳ Pending |
+| 5. Form Validation | High | `index.html`, `styles.css`, `app.js` | [#6](https://github.com/rostislav-sergeenkov/copilot-demo-nodejs/issues/6) | ⏳ Pending |
+| 6. Unit Tests | Medium | `app.test.js`, `api.test.js` | [#4](https://github.com/rostislav-sergeenkov/copilot-demo-nodejs/issues/4) | ⏳ Pending |
 | 5. Form Validation | High | `index.html`, `styles.css`, `app.js` |
 | 6. Unit Tests | Medium | `app.test.js`, `api.test.js` |
 
-**Total: 6 tasks**
+**Total: 6 tasks (1 complete, 5 remaining)**
 
 ---
 
 ## Execution Order
 
 ```
-Task 1 (Date Nav) → Task 2 (Loading) → Task 3 (Snackbar) → Task 4 (API) → Task 5 (Validation) → Task 6 (Tests)
+✅ Task 1 (Date Nav) → Task 2 (Loading) → Task 3 (Snackbar) → Task 4 (API) → Task 5 (Validation) → Task 6 (Tests)
 ```
 
 ---
 
-## Commit Strategy
+## Git Workflow (per task)
 
-```
-feat(ui): add date navigation with daily/monthly views
-feat(ux): add loading states and spinner
-feat(ux): enhance snackbar with dismiss button
-feat(api): add request timeout and network error handling
-feat(form): add inline validation with error messages
-test: add unit tests for new features
+```bash
+# 1. Create feature branch from develop
+git checkout develop && git pull origin develop
+git checkout -b feature/<issue-number>-<short-description>
+
+# 2. Implement & commit
+git add . && git commit -m "<commit message from task>"
+
+# 3. Push & create PR to develop
+git push -u origin feature/<issue-number>-<short-description>
+# Create PR with "Closes #<issue-number>" in description
+
+# 4. After merge, cleanup
+git checkout develop && git pull origin develop
+git branch -d feature/<issue-number>-<short-description>
 ```
 
 ---
 
-*Tasks Version: 2.1*
-*Created: December 2025*
-*Based on: ROADMAP.md v1.0*
+## Commit Messages (Conventional Commits)
+
+| Task | Commit Message |
+|------|----------------|
+| 1 | ✅ `feat(ui): add date navigation with daily/monthly views` |
+| 2 | `feat(ux): add loading states and spinner` |
+| 3 | `feat(ux): enhance snackbar with dismiss button` |
+| 4 | `feat(api): add request timeout and network error handling` |
+| 5 | `feat(form): add inline validation with error messages` |
+| 6 | `test: add unit tests for new features` |
+
+---
+
+*Tasks Version: 2.2*
+*Updated: December 2025*
+*Based on: ROADMAP.md v1.1, SPECIFICATION.md v1.2*
