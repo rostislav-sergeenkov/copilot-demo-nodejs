@@ -1,25 +1,29 @@
 # Expense Tracker — Technical Implementation Roadmap
 
-This document provides a phased implementation plan to address all gaps identified in `SPECIFICATION.md` v1.1. The roadmap prioritizes critical functionality first and organizes work into logical milestones.
+This document provides a phased implementation plan to address all gaps identified in `SPECIFICATION.md` v1.2. The roadmap prioritizes critical functionality first and organizes work into logical milestones.
+
+> **Branching Model:** This project uses **Gitflow**. All feature development must follow the branching strategy defined in `SPECIFICATION.md` §7.
 
 ---
 
 ## Executive Summary
 
-| Phase | Focus Area | Duration | Priority |
-|-------|------------|----------|----------|
-| 1 | View Toggle & Date Navigation | 2-3 days | Critical |
-| 2 | Loading States & UX Feedback | 1-2 days | High |
-| 3 | Form Validation & Error Handling | 1-2 days | High |
-| 4 | Accessibility Compliance | 1-2 days | Medium |
-| 5 | Testing & Quality Assurance | 1-2 days | Medium |
+| Phase | Focus Area | Duration | Priority | Status |
+|-------|------------|----------|----------|--------|
+| 1 | View Toggle & Date Navigation | 2-3 days | Critical | ✅ Complete |
+| 2 | Loading States & UX Feedback | 1-2 days | High | 🔄 In Progress |
+| 3 | Form Validation & Error Handling | 1-2 days | High | ⏳ Pending |
+| 4 | Accessibility Compliance | 1-2 days | Medium | ⏳ Pending |
+| 5 | Testing & Quality Assurance | 1-2 days | Medium | ⏳ Pending |
 | **Total** | | **6-11 days** | |
 
 ---
 
-## Phase 1: View Toggle & Date Navigation (Critical)
+## Phase 1: View Toggle & Date Navigation ✅ COMPLETE
 
 **Goal:** Enable daily and monthly views to actually filter and display data for the selected date/period.
+
+**Completed:** December 4, 2025 | **PR:** [#7](https://github.com/rostislav-sergeenkov/copilot-demo-nodejs/pull/7) | **Issue:** [#1](https://github.com/rostislav-sergeenkov/copilot-demo-nodejs/issues/1) (Closed)
 
 ### Milestone 1.1: HTML Structure Updates
 **File:** `app/public/index.html`
@@ -816,6 +820,8 @@ Week 3: Polish & Testing
 ## Definition of Done
 
 Each phase is considered complete when:
+
+### Code Quality
 1. ✅ All tasks in the milestone checklist are completed
 2. ✅ All acceptance criteria pass manual testing
 3. ✅ New tests are written and passing
@@ -823,20 +829,111 @@ Each phase is considered complete when:
 5. ✅ Code follows CONSTITUTION.md standards
 6. ✅ Changes documented (if needed)
 
+### Git Workflow (Gitflow)
+7. ✅ Feature branch created from `develop`
+8. ✅ Commits use conventional commit format (`feat:`, `fix:`, etc.)
+9. ✅ Pull Request created to `develop` branch
+10. ✅ PR description references issue number (e.g., "Closes #3")
+11. ✅ All CI checks pass on PR
+12. ✅ Code review approved (if team workflow)
+13. ✅ Squash merged to `develop`
+14. ✅ Feature branch deleted after merge
+15. ✅ Related GitHub Issue auto-closed
+
 ---
 
 ## Quick Start
 
 To begin implementation:
 
-1. **Start with Phase 1, Milestone 1.1** (HTML structure for date navigation)
-2. Run existing tests to ensure no regression: `npm test`
-3. Implement each milestone sequentially within a phase
-4. Commit after each milestone with descriptive message
-5. Run tests after each milestone
+### 1. Setup (One-time)
+```bash
+# Ensure you have the develop branch
+git fetch origin
+git checkout develop
+git pull origin develop
+```
+
+### 2. Start a New Feature
+```bash
+# Create feature branch from develop
+git checkout develop
+git pull origin develop
+git checkout -b feature/<issue-number>-<short-description>
+
+# Example:
+git checkout -b feature/3-loading-states
+```
+
+### 3. Implement the Feature
+1. Find the corresponding phase/milestone in this roadmap
+2. Complete tasks sequentially within the milestone
+3. Run tests after each milestone: `npm test`
+4. Commit with conventional commit messages:
+   ```bash
+   git add .
+   git commit -m "feat(ui): add loading spinner component"
+   ```
+
+### 4. Create Pull Request
+```bash
+# Push feature branch
+git push -u origin feature/<issue-number>-<short-description>
+
+# Create PR to develop branch
+# Use "Closes #<issue-number>" in PR description
+```
+
+### 5. Merge & Cleanup
+- Squash merge PR to `develop`
+- Delete feature branch after merge
+- Pull latest develop for next feature
+
+### GitHub Issues → Roadmap Mapping
+
+| Issue | Phase | Milestone |
+|-------|-------|----------|
+| #1 | Phase 1 | 1.1-1.4 | ✅ Complete |
+| #3 | Phase 2 | 2.1-2.2 | Loading States |
+| #5 | Phase 2 | 2.2 | Snackbar Enhancement |
+| #2 | Phase 3 | 3.1 | API Timeout |
+| #6 | Phase 3 | 3.2-3.3 | Form Validation |
+| #4 | Phase 5 | 5.1-5.3 | Unit Tests |
 
 ---
 
-*Roadmap Version: 1.0*
+## Release Process
+
+When all phases are complete:
+
+```bash
+# Create release branch from develop
+git checkout develop
+git pull origin develop
+git checkout -b release/v1.1.0
+
+# Update version in package.json
+# Update CHANGELOG.md
+# Final testing
+
+# Merge to main
+git checkout main
+git merge release/v1.1.0
+git tag -a v1.1.0 -m "Release v1.1.0"
+git push origin main --tags
+
+# Back-merge to develop
+git checkout develop
+git merge release/v1.1.0
+git push origin develop
+
+# Delete release branch
+git branch -d release/v1.1.0
+```
+
+---
+
+*Roadmap Version: 1.1*
 *Created: December 2025*
-*Based on: SPECIFICATION.md v1.1*
+*Updated: December 2025*
+*Based on: SPECIFICATION.md v1.2*
