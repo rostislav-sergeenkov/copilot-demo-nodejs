@@ -16,7 +16,8 @@ const state = {
     endDate: ''
   },
   editingId: null,
-  deleteId: null
+  deleteId: null,
+  isLoading: false
 };
 
 // DOM Elements
@@ -46,6 +47,8 @@ const elements = {
   confirmDeleteBtn: document.getElementById('confirmDeleteBtn'),
   snackbar: document.getElementById('snackbar'),
   snackbarMessage: document.getElementById('snackbarMessage'),
+  loadingOverlay: document.getElementById('loadingOverlay'),
+  saveBtn: document.getElementById('saveBtn'),
   // Date Navigation Elements
   dailyControls: document.getElementById('dailyControls'),
   monthlyControls: document.getElementById('monthlyControls'),
@@ -72,10 +75,27 @@ const categoryClassMap = {
 };
 
 /**
+ * Show loading overlay
+ */
+function showLoading() {
+  state.isLoading = true;
+  elements.loadingOverlay.classList.remove('hidden');
+}
+
+/**
+ * Hide loading overlay
+ */
+function hideLoading() {
+  state.isLoading = false;
+  elements.loadingOverlay.classList.add('hidden');
+}
+
+/**
  * Initialize the application
  */
 async function init() {
   try {
+    showLoading();
     await loadCategories();
     populateYearDropdown();
     initializeDateControls();
@@ -84,6 +104,8 @@ async function init() {
     setDefaultDate();
   } catch (error) {
     showSnackbar('Failed to initialize application: ' + error.message);
+  } finally {
+    hideLoading();
   }
 }
 
@@ -131,7 +153,9 @@ function populateCategoryDropdowns() {
  * Load expenses based on current view and filters
  */
 async function loadExpenses() {
+  const wasLoading = state.isLoading;
   try {
+    if (!wasLoading) showLoading();
     // If filters are applied, use filters
     if (state.filters.category || state.filters.startDate || state.filters.endDate) {
       const filters = { ...state.filters };
@@ -147,6 +171,8 @@ async function loadExpenses() {
     updateTableTitle();
   } catch (error) {
     showSnackbar('Failed to load expenses: ' + error.message);
+  } finally {
+    if (!wasLoading) hideLoading();
   }
 }
 
@@ -563,6 +589,11 @@ async function handleFormSubmit(e) {
     date: elements.date.value
   };
 
+  // Disable save button and show "Saving..."
+  const originalText = elements.saveBtn.textContent;
+  elements.saveBtn.disabled = true;
+  elements.saveBtn.textContent = 'Saving...';
+
   try {
     if (state.editingId) {
       await ExpenseAPI.update(state.editingId, expenseData);
@@ -575,6 +606,10 @@ async function handleFormSubmit(e) {
     await loadExpenses();
   } catch (error) {
     showSnackbar('Error: ' + error.message);
+  } finally {
+    // Re-enable save button and restore text
+    elements.saveBtn.disabled = false;
+    elements.saveBtn.textContent = originalText;
   }
 }
 
@@ -667,6 +702,8 @@ if (typeof module !== 'undefined' && module.exports) {
     goToThisMonth,
     updateDailyNavigationButtons,
     updateMonthlyNavigationButtons,
-    updateTableTitle
+    updateTableTitle,
+    showLoading,
+    hideLoading
   };
 }
