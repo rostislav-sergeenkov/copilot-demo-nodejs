@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Expense Tracker</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body>
+  <div class="app-container">
+    <!-- App Bar -->
+    <header class="app-bar">
+      <h1 class="app-title">
+        <span class="material-icons">account_balance_wallet</span>
+        Expense Tracker
+      </h1>
+    </header>
+
+    <main class="main-content">
+      <!-- Filters Section -->
+      <section class="card filters-section">
+        <h2 class="section-title">
+          <span class="material-icons">filter_list</span>
+          Filters
+        </h2>
+        <div class="filters-container">
+          <div class="filter-group">
+            <label for="filterCategory" class="input-label">Category</label>
+            <select id="filterCategory" class="input-select">
+              <option value="">All Categories</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label for="filterStartDate" class="input-label">Start Date</label>
+            <input type="date" id="filterStartDate" class="input-field">
+          </div>
+          <div class="filter-group">
+            <label for="filterEndDate" class="input-label">End Date</label>
+            <input type="date" id="filterEndDate" class="input-field">
+          </div>
+          <div class="filter-actions">
+            <button id="applyFilters" class="btn btn-primary">
+              <span class="material-icons">search</span>
+              Apply
+            </button>
+            <button id="clearFilters" class="btn btn-outlined">
+              <span class="material-icons">clear</span>
+              Clear
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- View Toggle -->
+      <div class="view-toggle">
+        <button id="dailyViewBtn" class="toggle-btn active">
+          <span class="material-icons">today</span>
+          Daily View
+        </button>
+        <button id="monthlyViewBtn" class="toggle-btn">
+          <span class="material-icons">calendar_month</span>
+          Monthly View
+        </button>
+      </div>
+
+      <!-- Expenses Table Section -->
+      <section class="card expenses-section">
+        <div class="section-header">
+          <h2 class="section-title">
+            <span class="material-icons">receipt_long</span>
+            <span id="tableTitle">All Expenses</span>
+          </h2>
+          <button id="addExpenseBtn" class="btn btn-fab">
+            <span class="material-icons">add</span>
+          </button>
+        </div>
+        
+        <div class="table-container">
+          <table class="data-table" id="expensesTable">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Description</th>
+                <th>Category</th>
+                <th class="text-right">Amount</th>
+                <th class="text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="expensesTableBody">
+              <!-- Expenses will be loaded here -->
+            </tbody>
+            <tfoot>
+              <tr>
+                <td colspan="3" class="text-right"><strong>Total:</strong></td>
+                <td class="text-right"><strong id="totalAmount">$0.00</strong></td>
+                <td></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+        
+        <div id="emptyState" class="empty-state hidden">
+          <span class="material-icons">inbox</span>
+          <p>No expenses found</p>
+          <button class="btn btn-primary" onclick="openModal()">Add your first expense</button>
+        </div>
+      </section>
+    </main>
+
+    <!-- Modal for Add/Edit Expense -->
+    <div id="expenseModal" class="modal hidden">
+      <div class="modal-backdrop"></div>
+      <div class="modal-content card">
+        <div class="modal-header">
+          <h2 id="modalTitle">Add Expense</h2>
+          <button class="btn-icon" onclick="closeModal()">
+            <span class="material-icons">close</span>
+          </button>
+        </div>
+        <form id="expenseForm">
+          <input type="hidden" id="expenseId">
+          <div class="form-group">
+            <label for="description" class="input-label">Description *</label>
+            <input type="text" id="description" class="input-field" required 
+                   placeholder="e.g., Lunch at restaurant">
+          </div>
+          <div class="form-group">
+            <label for="amount" class="input-label">Amount *</label>
+            <div class="input-with-prefix">
+              <span class="input-prefix">$</span>
+              <input type="number" id="amount" class="input-field" required 
+                     min="0" step="0.01" placeholder="0.00">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="category" class="input-label">Category *</label>
+            <select id="category" class="input-select" required>
+              <option value="">Select a category</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="date" class="input-label">Date *</label>
+            <input type="date" id="date" class="input-field" required>
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn btn-text" onclick="closeModal()">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="saveBtn">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="modal hidden">
+      <div class="modal-backdrop"></div>
+      <div class="modal-content card modal-small">
+        <div class="modal-header">
+          <h2>Delete Expense</h2>
+        </div>
+        <p class="modal-body-text">Are you sure you want to delete this expense? This action cannot be undone.</p>
+        <div class="modal-actions">
+          <button type="button" class="btn btn-text" onclick="closeDeleteModal()">Cancel</button>
+          <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Snackbar for notifications -->
+    <div id="snackbar" class="snackbar hidden">
+      <span id="snackbarMessage"></span>
+    </div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

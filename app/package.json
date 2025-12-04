@@ -1,0 +1,56 @@
+{
+  "name": "expense-tracker",
+  "version": "1.0.0",
+  "description": "A Node.js application to record and view daily financial transactions",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "test": "jest --coverage",
+    "test:backend": "jest --testPathPattern=tests/backend",
+    "test:frontend": "jest --testPathPattern=tests/frontend",
+    "test:watch": "jest --watch",
+    "db:init": "node src/database/init.js"
+  },
+  "keywords": [
+    "expense",
+    "tracker",
+    "nodejs",
+    "sqlite"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "better-sqlite3": "^9.4.3"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "supertest": "^6.3.4"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "coverageDirectory": "coverage",
+    "collectCoverageFrom": [
+      "src/**/*.js",
+      "public/js/**/*.js",
+      "!src/server.js"
+    ],
+    "projects": [
+      {
+        "displayName": "backend",
+        "testEnvironment": "node",
+        "testMatch": [
+          "<rootDir>/tests/backend/**/*.test.js"
+        ]
+      },
+      {
+        "displayName": "frontend",
+        "testEnvironment": "jsdom",
+        "testMatch": [
+          "<rootDir>/tests/frontend/**/*.test.js"
+        ]
+      }
+    ]
+  }
+}

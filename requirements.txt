@@ -1,0 +1,30 @@
+Expense Tracker — Project Description.
+
+
+Goal
+Record and view daily financial transactions.
+
+
+Planning and tracking
+The project implementation lifecycle is tracked using GitHub Issues.
+
+
+Features
+1. Graphical CRUD user interface for expenses, follow Material UI design.
+2. Display a table of daily expenses.
+3. Display a table of monthly expenses.
+4. Filter expenses by category.
+5. Implement capability to create, update and delete expense records.
+
+
+Technical Requirements
+1. The application backend is built using Node.js using minimum packages and follows established coding standards and best practices for Node.js development.
+2. The application frontend is built using vanilla JS, CSS and HTML and follows established coding standards and best practices for frontend development.
+3. The application source code is stored on GitHub.com.
+4. Data is saved in an SQLite table. Fields:
+4.1. description (string): Short description (e.g., “Lunch”).
+4.2. amount (decimal): Expense amount.
+4.3. category (string): Category (Groceries, Transport, Housing and Utilities, Restaurants and Cafes, Health and Medicine, Clothing & Footwear, Entertainment).
+3.4. date (date): The date when the expense occurred.
+4. Unit and Integrations tests are implemented on the frontend and the backend to ensure code correctness and facilitate early bug detection.
+5. GitHub Actions CI/CD pipeline runs tests on every pull request to the repository. It blocks PR merging if tests fail.
