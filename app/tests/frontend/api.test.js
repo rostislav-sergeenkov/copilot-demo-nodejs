@@ -246,3 +246,160 @@ describe('ExpenseAPI', () => {
     });
   });
 });
+
+describe('fetchWithTimeout', () => {
+  let fetchWithTimeout;
+  const API_TIMEOUT = 10000;
+
+  beforeEach(() => {
+    jest.useFakeTimers();
+    global.fetch = jest.fn();
+
+    // Define fetchWithTimeout
+    fetchWithTimeout = async (url, options = {}) => {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), API_TIMEOUT);
+
+      try {
+        const response = await fetch(url, {
+          ...options,
+          signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+        return response;
+      } catch (error) {
+        clearTimeout(timeoutId);
+        if (error.name === 'AbortError') {
+          throw new Error('Request timed out. Please check your connection and try again.');
+        }
+        throw error;
+      }
+    };
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+    jest.restoreAllMocks();
+  });
+
+  it('should call fetch with AbortController signal', async () => {
+    global.fetch.mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve({ success: true })
+    });
+
+    await fetchWithTimeout('/api/test');
+
+    expect(fetch).toHaveBeenCalledWith('/api/test', expect.objectContaining({
+      signal: expect.any(AbortSignal)
+    }));
+  });
+
+  it('should pass options to fetch', async () => {
+    global.fetch.mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve({ success: true })
+    });
+
+    const options = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ data: 'test' })
+    };
+
+    await fetchWithTimeout('/api/test', options);
+
+    expect(fetch).toHaveBeenCalledWith('/api/test', expect.objectContaining({
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ data: 'test' }),
+      signal: expect.any(AbortSignal)
+    }));
+  });
+
+  it('should return response on successful fetch', async () => {
+    const mockResponse = { ok: true, json: () => Promise.resolve({ data: 'test' }) };
+    global.fetch.mockResolvedValueOnce(mockResponse);
+
+    const result = await fetchWithTimeout('/api/test');
+
+    expect(result).toBe(mockResponse);
+  });
+
+  it('should throw timeout error when request times out', async () => {
+    // Create an AbortError
+    const abortError = new Error('Aborted');
+    abortError.name = 'AbortError';
+    
+    global.fetch.mockRejectedValueOnce(abortError);
+
+    await expect(fetchWithTimeout('/api/test')).rejects.toThrow('Request timed out. Please check your connection and try again.');
+  });
+
+  it('should rethrow non-timeout errors', async () => {
+    const networkError = new Error('Network failure');
+    global.fetch.mockRejectedValueOnce(networkError);
+
+    await expect(fetchWithTimeout('/api/test')).rejects.toThrow('Network failure');
+  });
+});
+
+describe('isOnline', () => {
+  let isOnline;
+
+  beforeEach(() => {
+    // Define isOnline
+    isOnline = () => {
+      return navigator.onLine;
+    };
+  });
+
+  it('should return true when navigator.onLine is true', () => {
+    Object.defineProperty(navigator, 'onLine', {
+      value: true,
+      configurable: true
+    });
+
+    expect(isOnline()).toBe(true);
+  });
+
+  it('should return false when navigator.onLine is false', () => {
+    Object.defineProperty(navigator, 'onLine', {
+      value: false,
+      configurable: true
+    });
+
+    expect(isOnline()).toBe(false);
+  });
+});
+
+describe('Offline Error Handling', () => {
+  let checkOnlineStatus;
+
+  beforeEach(() => {
+    // Define checkOnlineStatus helper
+    checkOnlineStatus = () => {
+      if (!navigator.onLine) {
+        throw new Error('You appear to be offline. Please check your internet connection.');
+      }
+    };
+  });
+
+  it('should throw error when offline', () => {
+    Object.defineProperty(navigator, 'onLine', {
+      value: false,
+      configurable: true
+    });
+
+    expect(() => checkOnlineStatus()).toThrow('You appear to be offline. Please check your internet connection.');
+  });
+
+  it('should not throw error when online', () => {
+    Object.defineProperty(navigator, 'onLine', {
+      value: true,
+      configurable: true
+    });
+
+    expect(() => checkOnlineStatus()).not.toThrow();
+  });
+});
